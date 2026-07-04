@@ -1,0 +1,16 @@
+server:
+  addr: ":8080"
+database:
+  dsn: "postgres://tracker:tracker@postgres:5432/tracker?sslmode=disable"
+  max_conns: 20
+redis:
+  addr: "redis:6379"
+  password: ""
+  db: 0
+jwt:
+  secret: "change-me-in-production"
+  ttl_minutes: 1440
+rate_limit:
+  requests_per_minute: 100
+email:
+  endpoint: "smtp://mailpit:1025"
