@@ -18,11 +18,23 @@ import (
 	"team-task-tracker-api/internal/repository"
 	"team-task-tracker-api/internal/service"
 
+	_ "team-task-tracker-api/docs"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+// @title Team Task Tracker API
+// @version 1.0
+// @description REST API for team task management, workers, skill-based auto assignment, audit history, comments, and reports.
+// @host localhost:8080
+// @BasePath /
+// @schemes http
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Enter the token with the `Bearer ` prefix, for example: Bearer eyJ...
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

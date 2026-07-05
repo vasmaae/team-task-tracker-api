@@ -1,0 +1,1013 @@
+basePath: /
+definitions:
+  internal_httpapi.authRequest:
+    properties:
+      email:
+        example: leader@example.com
+        type: string
+      password:
+        example: secret123
+        type: string
+    type: object
+  internal_httpapi.authResponse:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      user:
+        $ref: '#/definitions/internal_httpapi.userResponse'
+    type: object
+  internal_httpapi.autoAssignResponse:
+    properties:
+      assigned:
+        example: 3
+        type: integer
+    type: object
+  internal_httpapi.commentRequest:
+    properties:
+      body:
+        example: Need to update tests after this change.
+        type: string
+    type: object
+  internal_httpapi.createTeamRequest:
+    properties:
+      name:
+        example: Platform Team
+        type: string
+    type: object
+  internal_httpapi.errorResponse:
+    properties:
+      error:
+        example: invalid credentials
+        type: string
+    type: object
+  internal_httpapi.messageResponse:
+    properties:
+      message:
+        example: verification code sent
+        type: string
+    type: object
+  internal_httpapi.registerRequest:
+    properties:
+      email:
+        example: leader@example.com
+        type: string
+      name:
+        example: Alex Leader
+        type: string
+      password:
+        example: secret123
+        type: string
+    type: object
+  internal_httpapi.statusResponse:
+    properties:
+      status:
+        example: deleted
+        type: string
+    type: object
+  internal_httpapi.taskRequest:
+    properties:
+      assignee_id:
+        example: 2
+        type: integer
+      description:
+        example: Implement task CRUD and filters
+        type: string
+      skill:
+        example: go
+        type: string
+      skills:
+        example:
+        - go
+        - postgres
+        items:
+          type: string
+        type: array
+      status:
+        enum:
+        - backlog
+        - todo
+        - in_progress
+        - review
+        - ready_for_testing
+        - testing
+        - done
+        example: todo
+        type: string
+      team_id:
+        example: 1
+        type: integer
+      title:
+        example: Build task API
+        type: string
+    type: object
+  internal_httpapi.updateTaskRequest:
+    properties:
+      assignee_id:
+        example: 2
+        type: integer
+      description:
+        example: Implement task CRUD and filters
+        type: string
+      skill:
+        example: go
+        type: string
+      skills:
+        example:
+        - go
+        - postgres
+        items:
+          type: string
+        type: array
+      status:
+        enum:
+        - backlog
+        - todo
+        - in_progress
+        - review
+        - ready_for_testing
+        - testing
+        - done
+        example: in_progress
+        type: string
+      title:
+        example: Build task API
+        type: string
+    type: object
+  internal_httpapi.userResponse:
+    properties:
+      created_at:
+        example: "2026-07-05T10:00:00Z"
+        type: string
+      email:
+        example: leader@example.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Alex Leader
+        type: string
+    type: object
+  internal_httpapi.verifyRegisterCodeRequest:
+    properties:
+      code:
+        example: "123456"
+        type: string
+      email:
+        example: leader@example.com
+        type: string
+    type: object
+  internal_httpapi.workerRequest:
+    properties:
+      email:
+        example: ivan@example.com
+        type: string
+      name:
+        example: Ivan Petrov
+        type: string
+      skill:
+        example: go
+        type: string
+      skills:
+        example:
+        - go
+        - postgres
+        - redis
+        items:
+          type: string
+        type: array
+    type: object
+  team-task-tracker-api_internal_repository.InvalidAssignee:
+    properties:
+      assignee_email:
+        type: string
+      assignee_id:
+        type: integer
+      task_id:
+        type: integer
+      task_title:
+        type: string
+      team_id:
+        type: integer
+      team_name:
+        type: string
+    type: object
+  team-task-tracker-api_internal_repository.Task:
+    properties:
+      assignee_id:
+        type: integer
+      assignee_name:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      description:
+        type: string
+      done_at:
+        type: string
+      id:
+        type: integer
+      skill:
+        type: string
+      skills:
+        items:
+          type: string
+        type: array
+      status:
+        type: string
+      team_id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  team-task-tracker-api_internal_repository.TaskComment:
+    properties:
+      body:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      task_id:
+        type: integer
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
+  team-task-tracker-api_internal_repository.TaskHistory:
+    properties:
+      changed_at:
+        type: string
+      changed_by:
+        type: integer
+      field:
+        type: string
+      id:
+        type: integer
+      new_value:
+        type: string
+      old_value:
+        type: string
+      task_id:
+        type: integer
+    type: object
+  team-task-tracker-api_internal_repository.Team:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+  team-task-tracker-api_internal_repository.TeamSummary:
+    properties:
+      done_last_7_days:
+        type: integer
+      members_count:
+        type: integer
+      team_id:
+        type: integer
+      team_name:
+        type: string
+    type: object
+  team-task-tracker-api_internal_repository.TopCreator:
+    properties:
+      created_tasks:
+        type: integer
+      rank:
+        type: integer
+      team_id:
+        type: integer
+      team_name:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
+  team-task-tracker-api_internal_repository.Worker:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      skill:
+        type: string
+      skills:
+        items:
+          type: string
+        type: array
+      team_id:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: REST API for team task management, workers, skill-based auto assignment,
+    audit history, comments, and reports.
+  title: Team Task Tracker API
+  version: "1.0"
+paths:
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Credentials
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/internal_httpapi.authRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_httpapi.authResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      summary: Login
+      tags:
+      - Auth
+  /api/v1/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Leader registration data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/internal_httpapi.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_httpapi.authResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      summary: Register leader without email code
+      tags:
+      - Auth
+  /api/v1/register/request-code:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Leader registration data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/internal_httpapi.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/internal_httpapi.messageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      summary: Request registration code
+      tags:
+      - Auth
+  /api/v1/register/verify:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Email and verification code
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/internal_httpapi.verifyRegisterCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_httpapi.authResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      summary: Verify registration code
+      tags:
+      - Auth
+  /api/v1/reports/invalid-assignees:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/team-task-tracker-api_internal_repository.InvalidAssignee'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Find tasks assigned to users outside their team
+      tags:
+      - Reports
+  /api/v1/reports/team-summary:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/team-task-tracker-api_internal_repository.TeamSummary'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Team summary report
+      tags:
+      - Reports
+  /api/v1/reports/top-creators:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/team-task-tracker-api_internal_repository.TopCreator'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Top task creators per team
+      tags:
+      - Reports
+  /api/v1/tasks:
+    get:
+      parameters:
+      - description: Team ID
+        in: query
+        name: team_id
+        required: true
+        type: integer
+      - description: Task status
+        in: query
+        name: status
+        type: string
+      - description: Assignee ID
+        in: query
+        name: assignee_id
+        type: integer
+      - default: 20
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/team-task-tracker-api_internal_repository.Task'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: List tasks with filters and pagination
+      tags:
+      - Tasks
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Task data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/internal_httpapi.taskRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/team-task-tracker-api_internal_repository.Task'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create task
+      tags:
+      - Tasks
+  /api/v1/tasks/{id}:
+    delete:
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_httpapi.statusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete task
+      tags:
+      - Tasks
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Task data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/internal_httpapi.updateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/team-task-tracker-api_internal_repository.Task'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update task
+      tags:
+      - Tasks
+  /api/v1/tasks/{id}/comments:
+    get:
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/team-task-tracker-api_internal_repository.TaskComment'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: List task comments
+      tags:
+      - Comments
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Comment data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/internal_httpapi.commentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/team-task-tracker-api_internal_repository.TaskComment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add task comment
+      tags:
+      - Comments
+  /api/v1/tasks/{id}/history:
+    get:
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/team-task-tracker-api_internal_repository.TaskHistory'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get task history
+      tags:
+      - Tasks
+  /api/v1/teams:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/team-task-tracker-api_internal_repository.Team'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: List my teams
+      tags:
+      - Teams
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Team data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/internal_httpapi.createTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/team-task-tracker-api_internal_repository.Team'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create team
+      tags:
+      - Teams
+  /api/v1/teams/{id}/auto-assign:
+    post:
+      parameters:
+      - description: Team ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_httpapi.autoAssignResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Auto assign unassigned tasks by skills
+      tags:
+      - Teams
+  /api/v1/teams/{id}/workers:
+    get:
+      parameters:
+      - description: Team ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/team-task-tracker-api_internal_repository.Worker'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: List team workers
+      tags:
+      - Workers
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Team ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Worker data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/internal_httpapi.workerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/team-task-tracker-api_internal_repository.Worker'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create worker
+      tags:
+      - Workers
+  /api/v1/teams/{id}/workers/{worker_id}:
+    delete:
+      parameters:
+      - description: Team ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Worker ID
+        in: path
+        name: worker_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_httpapi.statusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete worker
+      tags:
+      - Workers
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Team ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Worker ID
+        in: path
+        name: worker_id
+        required: true
+        type: integer
+      - description: Worker data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/internal_httpapi.workerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/team-task-tracker-api_internal_repository.Worker'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpapi.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update worker
+      tags:
+      - Workers
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    description: 'Enter the token with the `Bearer ` prefix, for example: Bearer eyJ...'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -18,6 +18,7 @@ import (
 	"team-task-tracker-api/internal/service"
 
 	"github.com/redis/go-redis/v9"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
 type Server struct {
@@ -49,6 +50,10 @@ func (s *Server) Handler() http.Handler {
 }
 
 func (s *Server) routes() {
+	s.mux.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/swagger/index.html", http.StatusFound)
+	})
+	s.mux.Handle("/swagger/", httpSwagger.WrapHandler)
 	s.mux.HandleFunc("POST /api/v1/register/request-code", s.requestRegisterCode)
 	s.mux.HandleFunc("POST /api/v1/register/verify", s.verifyRegisterCode)
 	s.mux.HandleFunc("POST /api/v1/register", s.register)
@@ -72,6 +77,16 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /api/v1/reports/invalid-assignees", s.auth(s.invalidAssignees))
 }
 
+// requestRegisterCode godoc
+// @Summary Request registration code
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param payload body registerRequest true "Leader registration data"
+// @Success 202 {object} messageResponse
+// @Failure 400 {object} errorResponse
+// @Failure 502 {object} errorResponse
+// @Router /api/v1/register/request-code [post]
 func (s *Server) requestRegisterCode(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		Email    string `json:"email"`
@@ -102,6 +117,15 @@ func (s *Server) requestRegisterCode(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusAccepted, map[string]string{"message": "verification code sent"})
 }
 
+// verifyRegisterCode godoc
+// @Summary Verify registration code
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param payload body verifyRegisterCodeRequest true "Email and verification code"
+// @Success 201 {object} authResponse
+// @Failure 400 {object} errorResponse
+// @Router /api/v1/register/verify [post]
 func (s *Server) verifyRegisterCode(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		Email string `json:"email"`
@@ -123,6 +147,16 @@ func (s *Server) verifyRegisterCode(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, map[string]any{"user": user, "token": token})
 }
 
+// register godoc
+// @Summary Register leader without email code
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param payload body registerRequest true "Leader registration data"
+// @Success 201 {object} authResponse
+// @Failure 400 {object} errorResponse
+// @Failure 409 {object} errorResponse
+// @Router /api/v1/register [post]
 func (s *Server) register(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		Email    string `json:"email"`
@@ -150,6 +184,16 @@ func (s *Server) register(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, map[string]any{"user": user, "token": token})
 }
 
+// login godoc
+// @Summary Login
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param payload body authRequest true "Credentials"
+// @Success 200 {object} authResponse
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Router /api/v1/login [post]
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		Email    string `json:"email"`
@@ -171,6 +215,17 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"user": user, "token": token})
 }
 
+// createTeam godoc
+// @Summary Create team
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param payload body createTeamRequest true "Team data"
+// @Success 201 {object} repository.Team
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Router /api/v1/teams [post]
 func (s *Server) createTeam(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		Name string `json:"name"`
@@ -190,6 +245,14 @@ func (s *Server) createTeam(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, team)
 }
 
+// listTeams godoc
+// @Summary List my teams
+// @Tags Teams
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} repository.Team
+// @Failure 401 {object} errorResponse
+// @Router /api/v1/teams [get]
 func (s *Server) listTeams(w http.ResponseWriter, r *http.Request) {
 	teams, err := s.repo.ListTeamsForUser(r.Context(), userID(r))
 	if err != nil {
@@ -199,6 +262,16 @@ func (s *Server) listTeams(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, teams)
 }
 
+// listWorkers godoc
+// @Summary List team workers
+// @Tags Workers
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Team ID"
+// @Success 200 {array} repository.Worker
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Router /api/v1/teams/{id}/workers [get]
 func (s *Server) listWorkers(w http.ResponseWriter, r *http.Request) {
 	teamID, ok := pathID(w, r, "id")
 	if !ok {
@@ -216,6 +289,19 @@ func (s *Server) listWorkers(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, workers)
 }
 
+// createWorker godoc
+// @Summary Create worker
+// @Tags Workers
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Team ID"
+// @Param payload body workerRequest true "Worker data"
+// @Success 201 {object} repository.Worker
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Router /api/v1/teams/{id}/workers [post]
 func (s *Server) createWorker(w http.ResponseWriter, r *http.Request) {
 	teamID, ok := pathID(w, r, "id")
 	if !ok {
@@ -242,6 +328,20 @@ func (s *Server) createWorker(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, worker)
 }
 
+// updateWorker godoc
+// @Summary Update worker
+// @Tags Workers
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Team ID"
+// @Param worker_id path int true "Worker ID"
+// @Param payload body workerRequest true "Worker data"
+// @Success 200 {object} repository.Worker
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Router /api/v1/teams/{id}/workers/{worker_id} [put]
 func (s *Server) updateWorker(w http.ResponseWriter, r *http.Request) {
 	teamID, ok := pathID(w, r, "id")
 	if !ok {
@@ -272,6 +372,18 @@ func (s *Server) updateWorker(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, worker)
 }
 
+// deleteWorker godoc
+// @Summary Delete worker
+// @Tags Workers
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Team ID"
+// @Param worker_id path int true "Worker ID"
+// @Success 200 {object} statusResponse
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Router /api/v1/teams/{id}/workers/{worker_id} [delete]
 func (s *Server) deleteWorker(w http.ResponseWriter, r *http.Request) {
 	teamID, ok := pathID(w, r, "id")
 	if !ok {
@@ -292,6 +404,17 @@ func (s *Server) deleteWorker(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "deleted"})
 }
 
+// autoAssignTasks godoc
+// @Summary Auto assign unassigned tasks by skills
+// @Tags Teams
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Team ID"
+// @Success 200 {object} autoAssignResponse
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Router /api/v1/teams/{id}/auto-assign [post]
 func (s *Server) autoAssignTasks(w http.ResponseWriter, r *http.Request) {
 	teamID, ok := pathID(w, r, "id")
 	if !ok {
@@ -310,6 +433,18 @@ func (s *Server) autoAssignTasks(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]int{"assigned": assigned})
 }
 
+// createTask godoc
+// @Summary Create task
+// @Tags Tasks
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param payload body taskRequest true "Task data"
+// @Success 201 {object} repository.Task
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Router /api/v1/tasks [post]
 func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		TeamID      int64    `json:"team_id"`
@@ -342,6 +477,21 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, task)
 }
 
+// listTasks godoc
+// @Summary List tasks with filters and pagination
+// @Tags Tasks
+// @Produce json
+// @Security BearerAuth
+// @Param team_id query int true "Team ID"
+// @Param status query string false "Task status"
+// @Param assignee_id query int false "Assignee ID"
+// @Param limit query int false "Limit" default(20)
+// @Param offset query int false "Offset" default(0)
+// @Success 200 {array} repository.Task
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Router /api/v1/tasks [get]
 func (s *Server) listTasks(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	teamID, err := strconv.ParseInt(q.Get("team_id"), 10, 64)
@@ -380,6 +530,20 @@ func (s *Server) listTasks(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, tasks)
 }
 
+// updateTask godoc
+// @Summary Update task
+// @Tags Tasks
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Task ID"
+// @Param payload body updateTaskRequest true "Task data"
+// @Success 200 {object} repository.Task
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Router /api/v1/tasks/{id} [put]
 func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
 	taskID, ok := pathID(w, r, "id")
 	if !ok {
@@ -414,6 +578,18 @@ func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, task)
 }
 
+// deleteTask godoc
+// @Summary Delete task
+// @Tags Tasks
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Task ID"
+// @Success 200 {object} statusResponse
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Router /api/v1/tasks/{id} [delete]
 func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
 	taskID, ok := pathID(w, r, "id")
 	if !ok {
@@ -436,6 +612,17 @@ func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "deleted"})
 }
 
+// taskHistory godoc
+// @Summary Get task history
+// @Tags Tasks
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Task ID"
+// @Success 200 {array} repository.TaskHistory
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Router /api/v1/tasks/{id}/history [get]
 func (s *Server) taskHistory(w http.ResponseWriter, r *http.Request) {
 	taskID, ok := pathID(w, r, "id")
 	if !ok {
@@ -458,6 +645,17 @@ func (s *Server) taskHistory(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, history)
 }
 
+// taskComments godoc
+// @Summary List task comments
+// @Tags Comments
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Task ID"
+// @Success 200 {array} repository.TaskComment
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Router /api/v1/tasks/{id}/comments [get]
 func (s *Server) taskComments(w http.ResponseWriter, r *http.Request) {
 	taskID, ok := pathID(w, r, "id")
 	if !ok {
@@ -480,6 +678,20 @@ func (s *Server) taskComments(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, comments)
 }
 
+// addTaskComment godoc
+// @Summary Add task comment
+// @Tags Comments
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Task ID"
+// @Param payload body commentRequest true "Comment data"
+// @Success 201 {object} repository.TaskComment
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Failure 403 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Router /api/v1/tasks/{id}/comments [post]
 func (s *Server) addTaskComment(w http.ResponseWriter, r *http.Request) {
 	taskID, ok := pathID(w, r, "id")
 	if !ok {
@@ -512,6 +724,14 @@ func (s *Server) addTaskComment(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, comment)
 }
 
+// teamSummary godoc
+// @Summary Team summary report
+// @Tags Reports
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} repository.TeamSummary
+// @Failure 401 {object} errorResponse
+// @Router /api/v1/reports/team-summary [get]
 func (s *Server) teamSummary(w http.ResponseWriter, r *http.Request) {
 	out, err := s.repo.TeamSummary(r.Context())
 	if err != nil {
@@ -521,6 +741,14 @@ func (s *Server) teamSummary(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, out)
 }
 
+// topCreators godoc
+// @Summary Top task creators per team
+// @Tags Reports
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} repository.TopCreator
+// @Failure 401 {object} errorResponse
+// @Router /api/v1/reports/top-creators [get]
 func (s *Server) topCreators(w http.ResponseWriter, r *http.Request) {
 	out, err := s.repo.TopCreators(r.Context())
 	if err != nil {
@@ -530,6 +758,14 @@ func (s *Server) topCreators(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, out)
 }
 
+// invalidAssignees godoc
+// @Summary Find tasks assigned to users outside their team
+// @Tags Reports
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} repository.InvalidAssignee
+// @Failure 401 {object} errorResponse
+// @Router /api/v1/reports/invalid-assignees [get]
 func (s *Server) invalidAssignees(w http.ResponseWriter, r *http.Request) {
 	out, err := s.repo.InvalidAssignees(r.Context())
 	if err != nil {
